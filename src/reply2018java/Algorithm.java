@@ -294,4 +294,16 @@ public class Algorithm {
 		}
 
 	}
+	
+	public void controllaValori() {
+		//pacchetti disponibili
+		System.out.println("Pacchetti rimanenti:");
+		Collections.sort(packages, (a,b)-> a.getId()-b.getId());
+		System.out.println(packages);
+		
+		//situazione progetti
+		System.out.println("Situazione progetti:");
+		System.out.println(projects);
+
+	}
 }
