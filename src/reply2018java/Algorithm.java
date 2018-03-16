@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.io.BufferedWriter;
@@ -150,44 +151,71 @@ public class Algorithm {
 		}
 				
 	}
-	
+		
 	void acquistaRisorse() {
+		Project pass;
 		
-		//ordino per penalità decrescenti
-		Collections.sort(projects, (a,b)-> b.getPenalty()-a.getPenalty());
-		for(Project p : projects) {
-			assegnaRisorseProgetto(p);
-			//System.out.println(p);
+		while(true) {
+			pass = null;
+			calcolaNecessita();
+			Collections.sort(projects, (a,b)-> Double.compare(b.getNecessita(),a.getNecessita()));
+			//System.out.println(projects);
+			
+			//devo prendere progetti che non sono settati ignore, se non riesco a prendere niente ho finito
+			
+			//se il primo non ha bisogno di nulla, sono a posto
+			if(projects.get(0).getNecessita() == 0) {
+				//System.out.println("Fine");
+				break;
+			}
+
+			for(Project pj : projects) {
+				if(pj.getIgnore() == false) {
+					pass = pj;
+					break;
+				}	
+			}
+			//System.out.println(pj.getId() + " " + pj.getNecessita());
+			
+			//controllo se per caso ho finito
+			if(pass == null) break;
+			else assegnaRisorseProgetto(pass);
 		}
-		
-		Collections.sort(projects, (a,b)-> a.getId()-b.getId());
-		//System.out.println(projects);
+	
 	}
 	
-	void assegnaRisorseProgetto(Project pj) {
-		boolean fine=progettoSoddisfatto(pj);
-		Package pk;
-		
-		
-		
-		while(!fine) {
-			//calcolo appetibilita
-			calcoloAppetibilita(pj);
+	void calcolaNecessita() {
+		int unita;
+		for(Project pj : projects) {
+			unita = pj.getListUnits().stream().collect(Collectors.summingInt(a->a));
 			
-			//ordino pacchetti
-			Collections.sort(packages, (a,b)-> Double.compare(b.getAppetibilita(), a.getAppetibilita()));
+			//System.out.println("Progetto " + pj.getId() + " ha bisogno di " + unita);
 			
-			//estraggo il pacchetto migliore
-			pk = packages.get(0);
-			
-			//se questo pacchetto non mi serve -> appetibilita 0 -> non posso soddisfare ulteriormente le richieste
-			if(pk.getAppetibilita() == 0) return;
-			
-			assegna(pj, packages.get(0));
-			
-			//controllo se ho finito
-			fine = progettoSoddisfatto(pj);
+			pj.setNecessita(unita*pj.getPenalty());
 		}
+	}
+		
+	void assegnaRisorseProgetto(Project pj) {
+		Package pass=null;
+		//devo provare ad assegnare un pacchett oin ordine
+		//se non assegno nessun pacchetto devo settare ignore al progetto
+
+		//calcolo appetibilita
+		calcoloAppetibilita(pj);
+		
+		//ordino pacchetti
+		Collections.sort(packages, (a,b)-> Double.compare(b.getAppetibilita(), a.getAppetibilita()));
+		
+		//estraggo il pacchetto migliore
+		for(Package pk : packages) {
+			if(pk.getAppetibilita() != 0) {
+				pass = pk;
+				break;
+			}
+		}
+		
+		if(pass == null) pj.setIgnore(true);
+		else assegna(pj, pass);
 	}
 	
 	void calcoloAppetibilita(Project pj) {
@@ -233,6 +261,7 @@ public class Algorithm {
 		for(int i=0; i<S; i++) {
 			un = pj.getUnitsService(i);
 			un -= pk.getUnitsxService(i);
+			if(un < 0) un = 0;
 			pj.refreshUnitService(i, un);
 		}	
 		

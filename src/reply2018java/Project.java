@@ -4,12 +4,15 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Collection;
 
 public class Project {
 	private int id, penalty;
 	private Country c;
 	private Map<Integer, Integer> unitsXservice;
 	private Map<Integer, Integer> numberPackets;
+	private double necessity;
+	private boolean ignore;
 
 
 	public Project(int id, int penalty, Country c) {
@@ -17,6 +20,7 @@ public class Project {
 		this.id = id;
 		this.penalty = penalty;
 		this.c = c;
+		this.ignore = false;
 		
 		unitsXservice = new TreeMap<>();
 		numberPackets = new TreeMap<>();
@@ -42,6 +46,10 @@ public class Project {
 		this.unitsXservice.put(id, units);
 	}
 	
+	public Collection<Integer> getListUnits() {
+		return this.unitsXservice.values();
+	}
+	
 	public String toString() {
 		//return this.id + " " + this.penalty + " " + this.c + "\n" + this.unitsXservice;
 		return "Progetto: " +  this.id + "\n" + this.unitsXservice;
@@ -63,5 +71,21 @@ public class Project {
 	
 	public Set<Entry<Integer, Integer>> getEntries() {
 		return this.numberPackets.entrySet();
+	}
+	
+	public double getNecessita() {
+		return this.necessity;
+	}
+	
+	public void setNecessita(double nec) {
+		this.necessity = nec;
+	}
+	
+	public void setIgnore(boolean bool) {
+		this.ignore=bool;
+	}
+	
+	public boolean getIgnore() {
+		return this.ignore;
 	}
 }
