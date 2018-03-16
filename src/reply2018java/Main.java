@@ -15,6 +15,8 @@ public class Main {
 		
 		a.outputFile("first_adventure.out");
 		
+		System.out.println("Stampa eseguita");
+		
 	}
 
 }
