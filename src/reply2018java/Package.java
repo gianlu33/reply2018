@@ -9,11 +9,11 @@ public class Package {
 	private int id, disp;
 	private float price;
 	private double appet;
-	Map<Integer, Integer> unitsXservice;
-	Map<Integer, Integer> latencyXcountry;
-	Set<Project> progettiServiti;
-	Provider p;
-	Region r;
+	private Map<Integer, Integer> unitsXservice;
+	private Map<Integer, Integer> latencyXcountry;
+	private Set<Project> progettiServiti;
+	private Provider p;
+	private Region r;
 	
 	public Package(int id, int disp, float price, Provider p, Region r) {
 		// TODO Auto-generated constructor stub
@@ -78,5 +78,13 @@ public class Package {
 	
 	public boolean checkProject(Project p) {
 		return this.progettiServiti.contains(p);
+	}
+	
+	public Provider getProvider() {
+		return this.p;
+	}
+	
+	public Region getRegion() {
+		return this.r;
 	}
 }

@@ -7,6 +7,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Set;
+import java.util.Map.Entry;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 
 
 public class Algorithm {
@@ -156,6 +160,8 @@ public class Algorithm {
 			//System.out.println(p);
 		}
 		
+		Collections.sort(projects, (a,b)-> a.getId()-b.getId());
+		//System.out.println(projects);
 	}
 	
 	void assegnaRisorseProgetto(Project pj) {
@@ -241,4 +247,51 @@ public class Algorithm {
 		return true;
 	}
 	
+	public void outputSchermo() {
+		//sono gia ordinati per nome
+		Set<Entry<Integer, Integer>> set;
+		Package p;
+		int id, num;
+		
+		for(Project pj : projects) {
+			set = pj.getEntries();
+			
+			for(Entry<Integer, Integer> e : set) {
+				id = e.getKey();
+				num = e.getValue();
+				p = packages.get(id);
+				System.out.print(p.getProvider().getId() + " " + p.getRegion().getId() + " " + num + " ");
+			}
+			System.out.println();
+		}
+	}
+	
+	public void outputFile(String file) {
+		
+		try {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		
+		Set<Entry<Integer, Integer>> set;
+		Package p;
+		int id, num;
+		
+		for(Project pj : projects) {
+			set = pj.getEntries();
+			
+			for(Entry<Integer, Integer> e : set) {
+				id = e.getKey();
+				num = e.getValue();
+				p = packages.get(id);
+				writer.append(p.getProvider().getId() + " " + p.getRegion().getId() + " " + num + " ");
+			}
+			writer.append("\n");
+			
+		}
+		
+		writer.close();		
+		}catch(IOException ioe) {
+			System.out.println(ioe.getMessage());
+		}
+
+	}
 }

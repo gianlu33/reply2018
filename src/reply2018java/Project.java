@@ -2,6 +2,8 @@ package reply2018java;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Set;
+import java.util.Map.Entry;
 
 public class Project {
 	private int id, penalty;
@@ -55,5 +57,9 @@ public class Project {
 			this.numberPackets.replace(id, ++num);
 		}
 		else this.numberPackets.put(id, 1);
+	}
+	
+	public Set<Entry<Integer, Integer>> getEntries() {
+		return this.numberPackets.entrySet();
 	}
 }

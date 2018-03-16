@@ -13,6 +13,8 @@ public class Main {
 		
 		System.out.println("Risorse acquistate");
 		
+		a.outputFile("first_adventure.out");
+		
 	}
 
 }
