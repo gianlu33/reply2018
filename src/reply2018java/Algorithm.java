@@ -38,7 +38,7 @@ public class Algorithm {
 		ipj=0;
 	}
 
-	void inputData(String file) {
+	public void inputData(String file) {
 		int i,j,k;
 		try {
 		BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -152,7 +152,7 @@ public class Algorithm {
 				
 	}
 		
-	void acquistaRisorse() {
+	public void acquistaRisorse() {
 		Project pass;
 		
 		while(true) {
@@ -183,7 +183,7 @@ public class Algorithm {
 	
 	}
 	
-	void calcolaNecessita() {
+	private void calcolaNecessita() {
 		int unita;
 		for(Project pj : projects) {
 			unita = pj.getListUnits().stream().collect(Collectors.summingInt(a->a));
@@ -195,7 +195,7 @@ public class Algorithm {
 		}
 	}
 		
-	void assegnaRisorseProgetto(Project pj) {
+	private void assegnaRisorseProgetto(Project pj) {
 		Package pass=null;
 		//devo provare ad assegnare un pacchett oin ordine
 		//se non assegno nessun pacchetto devo settare ignore al progetto
@@ -218,7 +218,7 @@ public class Algorithm {
 		else assegna(pj, pass);
 	}
 	
-	void calcoloAppetibilita(Project pj) {
+	private void calcoloAppetibilita(Project pj) {
 		int sommaAppetibili, i, resPj, dispPk;
 		double appet, modPreso;
 		int idc = pj.getCountry().getId();
@@ -251,7 +251,7 @@ public class Algorithm {
 		
 	}
 	
-	void assegna(Project pj, Package pk) {
+	private void assegna(Project pj, Package pk) {
 		//OTTIMIZZARE:  tolgo e rimetto dalla mappa non mi piace
 		int un;
 
@@ -267,14 +267,6 @@ public class Algorithm {
 		
 		pj.incrementaPackage(pk.getId());
 		//System.out.println("assegnato pacchetto " + pk +  " a " + pj);
-	}
-	
-	
-	public boolean progettoSoddisfatto(Project pj) {
-		for(int i=0; i<S; i++) {
-			if(pj.getUnitsService(i) > 0) return false;
-		}
-		return true;
 	}
 	
 	public void outputSchermo() {
