@@ -1,13 +1,17 @@
 package reply2018java;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Set;
+import java.util.HashSet;
 
 public class Package {
 	
 	private int id, disp;
 	private float price;
+	private double appet;
 	Map<Integer, Integer> unitsXservice;
 	Map<Integer, Integer> latencyXcountry;
+	Set<Project> progettiServiti;
 	Provider p;
 	Region r;
 	
@@ -21,6 +25,7 @@ public class Package {
 		
 		unitsXservice = new TreeMap<>();
 		latencyXcountry = new TreeMap<>();
+		progettiServiti = new HashSet<>();
 	}
 	
 	public int getId() {
@@ -57,5 +62,21 @@ public class Package {
 	
 	public String toString() {
 		return this.id + " Disp:" + this.disp + " Price:" + this.price + "\n" + "Provider: " + this.p + "\n" + "Region: " + this.r + "\nUnits: " + this.unitsXservice + "\nLatency: " + this.latencyXcountry;
+	}
+	
+	public double getAppetibilita() {
+		return this.appet;
+	}
+	
+	public void setAppetibilita(double app) {
+		this.appet = app;
+	}
+	
+	public void addProject(Project p) {
+		this.progettiServiti.add(p);
+	}
+	
+	public boolean checkProject(Project p) {
+		return this.progettiServiti.contains(p);
 	}
 }

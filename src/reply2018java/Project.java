@@ -4,9 +4,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Project {
-	int id, penalty;
-	Country c;
-	Map<Integer, Integer> unitsXservice;
+	private int id, penalty;
+	private Country c;
+	private Map<Integer, Integer> unitsXservice;
+	private Map<Integer, Integer> numberPackets;
 
 
 	public Project(int id, int penalty, Country c) {
@@ -16,6 +17,7 @@ public class Project {
 		this.c = c;
 		
 		unitsXservice = new TreeMap<>();
+		numberPackets = new TreeMap<>();
 	}
 	
 	public int getId() {
@@ -40,6 +42,18 @@ public class Project {
 	
 	public String toString() {
 		return this.id + " " + this.penalty + " " + this.c + "\n" + this.unitsXservice;
-
+	}
+	
+	public void refreshUnitService(int serv, int units) {
+		this.unitsXservice.replace(serv, units);		
+	}
+	
+	public void incrementaPackage(int id) {
+		//OTTIMIZZARE, FA SCHIFO
+		if(this.numberPackets.containsKey(id)) {
+			int num = this.numberPackets.get(id);
+			this.numberPackets.replace(id, ++num);
+		}
+		else this.numberPackets.put(id, 1);
 	}
 }

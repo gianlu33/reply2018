@@ -2,8 +2,9 @@ package reply2018java;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-//import java.util.List;
-//import java.util.LinkedList;
+import java.util.List;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -11,18 +12,18 @@ import java.util.TreeMap;
 public class Algorithm {
 	int V,S,C,P;
 	int is, ic, ipr, ir, ipk, ipj;
-	Map<Integer, Service> services;
-	Map<Integer, Country> countries;
-	Map<String, Integer> idcountries;
-	Map<Integer, Package> packages;
-	Map<Integer, Project> projects;
+	Map<Integer, Service> services; //serve?
+	Map<Integer, Country> countries; // serve?
+	Map<String, Integer> idcountries; //serve?
+	List<Package> packages;
+	List<Project> projects;
 	
 	public Algorithm() {
 		// TODO Auto-generated constructor stub
 		services = new TreeMap<>();
 		countries = new TreeMap<>();
-		packages = new TreeMap<>();
-		projects = new TreeMap<>();
+		packages = new LinkedList<>();
+		projects = new LinkedList<>();
 		idcountries = new TreeMap<>();
 		is=0;
 		ic=0;
@@ -94,8 +95,8 @@ public class Algorithm {
 				data = line.split(" ");
 				np = Integer.parseInt(data[0]);
 				cp = Float.parseFloat(data[1]);
-				pack = new Package(ipk, np, cp, p, r);
-				packages.put(ipk++, pack);
+				pack = new Package(ipk++, np, cp, p, r);
+				packages.add(pack);
 				
 				for(k=0; k<S; k++) {
 					pack.addUnitsService(k, Integer.parseInt(data[k+2]));
@@ -107,7 +108,7 @@ public class Algorithm {
 					pack.addLatencyCountry(k, Integer.parseInt(data[k]));
 				}	
 				
-				System.out.println(pack);
+				//System.out.println(pack);
 			}
 		}
 		
@@ -126,8 +127,8 @@ public class Algorithm {
 			cid = idcountries.get(nc);
 			co = countries.get(cid);
 			
-			pj = new Project(ipj, pen, co);
-			projects.put(ipj++, pj);
+			pj = new Project(ipj++, pen, co);
+			projects.add(pj);
 			
 			for(j=0; j<S; j++) {
 				pj.addUnitsService(j, Integer.parseInt(data[j+2]));
@@ -135,7 +136,7 @@ public class Algorithm {
 			
 			//System.out.println(pj);
 		}
-		
+		//System.out.println(projects);
 
 	
 		reader.close();
@@ -143,6 +144,101 @@ public class Algorithm {
 		catch(IOException ioe){
 			System.out.println(ioe.getMessage());
 		}
+				
+	}
+	
+	void acquistaRisorse() {
+		
+		//ordino per penalità decrescenti
+		Collections.sort(projects, (a,b)-> b.getPenalty()-a.getPenalty());
+		for(Project p : projects) {
+			assegnaRisorseProgetto(p);
+			//System.out.println(p);
+		}
 		
 	}
+	
+	void assegnaRisorseProgetto(Project pj) {
+		boolean fine=progettoSoddisfatto(pj);
+		Package pk;
+		
+		
+		
+		while(!fine) {
+			//calcolo appetibilita
+			calcoloAppetibilita(pj);
+			
+			//ordino pacchetti
+			Collections.sort(packages, (a,b)-> Double.compare(b.getAppetibilita(), a.getAppetibilita()));
+			
+			//estraggo il pacchetto migliore
+			pk = packages.get(0);
+			
+			//se questo pacchetto non mi serve -> appetibilita 0 -> non posso soddisfare ulteriormente le richieste
+			if(pk.getAppetibilita() == 0) return;
+			
+			assegna(pj, packages.get(0));
+			
+			//controllo se ho finito
+			fine = progettoSoddisfatto(pj);
+		}
+	}
+	
+	void calcoloAppetibilita(Project pj) {
+		int sommaAppetibili, i, resPj, dispPk;
+		double appet, modPreso;
+		int idc = pj.getCountry().getId();
+		
+		for(Package p : packages) {
+			sommaAppetibili=0;
+			
+			if(p.getDisp() == 0) {
+				p.setAppetibilita(0);
+				continue;
+			}
+			
+			//sommaappetibili
+			for(i=0; i<S; i++) {
+				resPj = pj.getUnitsService(i);
+				dispPk = p.getUnitsxService(i);
+				
+				if(resPj<dispPk) sommaAppetibili += resPj;
+				else sommaAppetibili += dispPk;
+			}
+			
+			//setto modPreso
+			if(p.checkProject(pj)) modPreso=1.2;
+			else modPreso=1;
+			
+			appet = (sommaAppetibili)/(p.getPrice()*p.getLatencyxCountry(idc)*modPreso);
+			p.setAppetibilita(appet);
+			
+		}
+		
+	}
+	
+	void assegna(Project pj, Package pk) {
+		//OTTIMIZZARE:  tolgo e rimetto dalla mappa non mi piace
+		int un;
+
+		pk.decrementDisp();
+		pk.addProject(pj);
+		
+		for(int i=0; i<S; i++) {
+			un = pj.getUnitsService(i);
+			un -= pk.getUnitsxService(i);
+			pj.refreshUnitService(i, un);
+		}	
+		
+		pj.incrementaPackage(pk.getId());
+	}
+	
+	
+	public boolean progettoSoddisfatto(Project pj) {
+		for(int i=0; i<S; i++) {
+			if(pj.getUnitsService(i) > 0) return false;
+		}
+		return true;
+	}
+	
 }
