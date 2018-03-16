@@ -52,7 +52,7 @@ public class Project {
 	
 	public String toString() {
 		//return this.id + " " + this.penalty + " " + this.c + "\n" + this.unitsXservice;
-		return "Progetto: " +  this.id + "\n" + this.unitsXservice;
+		return "Progetto: " +  this.id + " " + this.penalty + "\n" + this.unitsXservice;
 
 	}
 	

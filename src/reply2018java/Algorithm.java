@@ -165,7 +165,6 @@ public class Algorithm {
 			
 			//se il primo non ha bisogno di nulla, sono a posto
 			if(projects.get(0).getNecessita() == 0) {
-				//System.out.println("Fine");
 				break;
 			}
 
@@ -188,10 +187,11 @@ public class Algorithm {
 		int unita;
 		for(Project pj : projects) {
 			unita = pj.getListUnits().stream().collect(Collectors.summingInt(a->a));
+			//System.out.println("Unita per penalty: " + (double)unita*(double)pj.getPenalty());
 			
 			//System.out.println("Progetto " + pj.getId() + " ha bisogno di " + unita);
 			
-			pj.setNecessita(unita*pj.getPenalty());
+			pj.setNecessita((double)unita*(double)pj.getPenalty());
 		}
 	}
 		
@@ -266,6 +266,7 @@ public class Algorithm {
 		}	
 		
 		pj.incrementaPackage(pk.getId());
+		//System.out.println("assegnato pacchetto " + pk +  " a " + pj);
 	}
 	
 	
@@ -332,6 +333,7 @@ public class Algorithm {
 		
 		//situazione progetti
 		System.out.println("Situazione progetti:");
+		Collections.sort(projects, (a,b)-> a.getId()-b.getId());
 		System.out.println(projects);
 
 	}
