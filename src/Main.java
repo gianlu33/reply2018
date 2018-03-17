@@ -7,7 +7,7 @@ public class Main {
 		Algorithm a = new Algorithm();
 		
 		//System.out.flush();
-		a.inputData("first_adventure.in");
+		a.inputData("second_adventure.in");
 		
 		System.out.println("File letto correttamente");
 		
@@ -15,11 +15,11 @@ public class Main {
 		
 		System.out.println("Risorse acquistate");
 		
-		a.outputFile("first_adventure.out");
+		a.outputFile("second_adventure.out");
 		
 		System.out.println("Stampa eseguita");
 		
-		a.controllaValori();
+		//a.controllaValori();
 		
 		System.out.println("Fine");		
 		
