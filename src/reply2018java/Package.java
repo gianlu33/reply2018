@@ -1,27 +1,30 @@
 package reply2018java;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import java.util.Set;
 import java.util.HashSet;
 
 public class Package {
 	
 	private int id, disp;
-	private float price;
+	private double price;
 	private double appet;
 	private Map<Integer, Integer> unitsXservice;
 	private Map<Integer, Integer> latencyXcountry;
 	private Set<Project> progettiServiti;
 	private Provider p;
 	private Region r;
+	private int totUnits;
 	
-	public Package(int id, int disp, float price, Provider p, Region r) {
+	public Package(int id, int disp, double price, Provider p, Region r) {
 		// TODO Auto-generated constructor stub
 		this.id = id;
 		this.disp = disp;
 		this.price = price;
 		this.p = p;
 		this.r = r;
+		this.totUnits=0;
 		
 		unitsXservice = new TreeMap<>();
 		latencyXcountry = new TreeMap<>();
@@ -36,7 +39,7 @@ public class Package {
 		return this.disp;
 	}
 	
-	public float getPrice() {
+	public double getPrice() {
 		return this.price;
 	}
 	
@@ -88,4 +91,17 @@ public class Package {
 	public Region getRegion() {
 		return this.r;
 	}
+	
+	public int getTotalUnits() {
+		return this.totUnits;
+	}
+	
+	public void setTotalUnits(int tot) {
+		this.totUnits = tot;
+	}
+	
+	public void calcolaTotUnits() {
+		this.unitsXservice.values().stream().collect(Collectors.summingInt(a->a));
+	}
+
 }

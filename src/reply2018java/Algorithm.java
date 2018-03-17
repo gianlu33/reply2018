@@ -80,7 +80,7 @@ public class Algorithm {
 		Region r;
 		Package pack;
 		int rv, np;
-		float cp;
+		double cp;
 		for(i=0; i<V; i++) {
 			//provider
 			line = reader.readLine();
@@ -99,13 +99,15 @@ public class Algorithm {
 				line = reader.readLine();
 				data = line.split(" ");
 				np = Integer.parseInt(data[0]);
-				cp = Float.parseFloat(data[1]);
+				cp = Double.parseDouble(data[1]);
 				pack = new Package(ipk++, np, cp, p, r);
 				packages.add(pack);
 				
 				for(k=0; k<S; k++) {
 					pack.addUnitsService(k, Integer.parseInt(data[k+2]));
 				}
+				
+				pack.calcolaTotUnits();
 				
 				line = reader.readLine();
 				data = line.split(" ");
@@ -139,6 +141,7 @@ public class Algorithm {
 				pj.addUnitsService(j, Integer.parseInt(data[j+2]));
 			}
 			
+			pj.calcolaTotUnits();
 			//System.out.println(pj);
 		}
 		//System.out.println(projects);
@@ -165,6 +168,7 @@ public class Algorithm {
 			
 			//se il primo non ha bisogno di nulla, sono a posto
 			if(projects.get(0).getNecessita() == 0) {
+				//System.out.println("finish");
 				break;
 			}
 
@@ -184,14 +188,10 @@ public class Algorithm {
 	}
 	
 	private void calcolaNecessita() {
-		int unita;
 		for(Project pj : projects) {
-			unita = pj.getListUnits().stream().collect(Collectors.summingInt(a->a));
 			//System.out.println("Unita per penalty: " + (double)unita*(double)pj.getPenalty());
-			
 			//System.out.println("Progetto " + pj.getId() + " ha bisogno di " + unita);
-			
-			pj.setNecessita((double)unita*(double)pj.getPenalty());
+			pj.calcolaNecessita();
 		}
 	}
 		
@@ -241,10 +241,10 @@ public class Algorithm {
 			}
 			
 			//setto modPreso
-			if(p.checkProject(pj)) modPreso=1.2;
+			if(p.checkProject(pj)) modPreso=2;
 			else modPreso=1;
 			
-			appet = (sommaAppetibili)/(p.getPrice()*p.getLatencyxCountry(idc)*modPreso);
+			appet = ((double)sommaAppetibili)/(p.getPrice()*(double)p.getLatencyxCountry(idc)*modPreso);
 			p.setAppetibilita(appet);
 			
 		}
@@ -253,7 +253,7 @@ public class Algorithm {
 	
 	private void assegna(Project pj, Package pk) {
 		//OTTIMIZZARE:  tolgo e rimetto dalla mappa non mi piace
-		int un;
+		int un, tot=0;
 
 		pk.decrementDisp();
 		pk.addProject(pj);
@@ -263,7 +263,9 @@ public class Algorithm {
 			un -= pk.getUnitsxService(i);
 			if(un < 0) un = 0;
 			pj.refreshUnitService(i, un);
+			tot+=un;
 		}	
+		pj.setTotalUnits(tot);
 		
 		pj.incrementaPackage(pk.getId());
 		//System.out.println("assegnato pacchetto " + pk +  " a " + pj);
@@ -325,7 +327,9 @@ public class Algorithm {
 		
 		//situazione progetti
 		System.out.println("Situazione progetti:");
-		Collections.sort(projects, (a,b)-> a.getId()-b.getId());
+		Collections.sort(projects, (a,b) -> Double.compare(b.getNecessita(), a.getNecessita()));
+		//Collections.sort(projects, (a,b) -> a.getTotalUnits()-b.getTotalUnits());
+
 		System.out.println(projects);
 
 	}

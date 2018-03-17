@@ -5,6 +5,7 @@ public class Main {
 		// TODO Auto-generated method stub
 		Algorithm a = new Algorithm();
 		
+		//System.out.flush();
 		a.inputData("first_adventure.in");
 		
 		System.out.println("File letto correttamente");

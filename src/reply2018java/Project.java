@@ -2,6 +2,7 @@ package reply2018java;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.Collection;
@@ -13,6 +14,7 @@ public class Project {
 	private Map<Integer, Integer> numberPackets;
 	private double necessity;
 	private boolean ignore;
+	private int totUnits;
 
 
 	public Project(int id, int penalty, Country c) {
@@ -21,6 +23,7 @@ public class Project {
 		this.penalty = penalty;
 		this.c = c;
 		this.ignore = false;
+		this.totUnits=0;
 		
 		unitsXservice = new TreeMap<>();
 		numberPackets = new TreeMap<>();
@@ -52,7 +55,7 @@ public class Project {
 	
 	public String toString() {
 		//return this.id + " " + this.penalty + " " + this.c + "\n" + this.unitsXservice;
-		return "Progetto: " +  this.id + " " + this.penalty + "\n" + this.unitsXservice;
+		return "Progetto: " +  this.id + " " + this.necessity + " " + this.totUnits + "\n" + this.unitsXservice;
 
 	}
 	
@@ -81,11 +84,28 @@ public class Project {
 		this.necessity = nec;
 	}
 	
+	public void calcolaNecessita() {
+		this.necessity = (double)this.totUnits*(double)this.penalty;
+		//if(this.necessity==0) System.out.println("c'è un problema");
+	}
+	
 	public void setIgnore(boolean bool) {
 		this.ignore=bool;
 	}
 	
 	public boolean getIgnore() {
 		return this.ignore;
+	}
+	
+	public int getTotalUnits() {
+		return this.totUnits;
+	}
+	
+	public void setTotalUnits(int tot) {
+		this.totUnits = tot;
+	}
+	
+	public void calcolaTotUnits() {
+		this.totUnits = this.unitsXservice.values().stream().collect(Collectors.summingInt(a->a));
 	}
 }
