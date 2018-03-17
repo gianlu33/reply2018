@@ -14,13 +14,13 @@ import java.io.FileWriter;
 
 
 public class Algorithm {
-	int V,S,C,P;
-	int is, ic, ipr, ipk, ipj;
-	Map<Integer, Service> services; //serve?
-	Map<Integer, Country> countries; // serve?
-	Map<String, Integer> idcountries; //serve?
-	List<Package> packages;
-	List<Project> projects;
+	private int V,S,C,P;
+	private int is, ic, ipr, ipk, ipj;
+	private Map<Integer, Service> services; //serve?
+	private Map<Integer, Country> countries; // serve?
+	private Map<String, Integer> idcountries; //serve?
+	private List<Package> packages;
+	private List<Project> projects;
 	
 	public Algorithm() {
 		// TODO Auto-generated constructor stub
