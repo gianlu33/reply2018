@@ -16,7 +16,7 @@ import java.io.FileWriter;
 
 public class Algorithm {
 	int V,S,C,P;
-	int is, ic, ipr, ir, ipk, ipj;
+	int is, ic, ipr, ipk, ipj;
 	Map<Integer, Service> services; //serve?
 	Map<Integer, Country> countries; // serve?
 	Map<String, Integer> idcountries; //serve?
@@ -33,13 +33,12 @@ public class Algorithm {
 		is=0;
 		ic=0;
 		ipr=0;
-		ir=0;
 		ipk=0;
 		ipj=0;
 	}
 
 	public void inputData(String file) {
-		int i,j,k;
+		int i,j,k, ir;
 		try {
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		
@@ -92,7 +91,9 @@ public class Algorithm {
 			for(j=0; j<rv; j++) {
 				//regionname
 				line = reader.readLine();
-				r = new Region(ir++, line, p);
+				ir = p.getIr();
+				r = new Region(ir, line, p);
+				p.incrementIr();
 				//System.out.println(r);
 				
 				//pacchetti
