@@ -47,8 +47,8 @@ public class Package {
 		return unitsXservice.get(id);
 	}
 	
-	public void decrementDisp() {
-		this.disp--;
+	public void decrementDisp(int num) {
+		this.disp -= num;
 	}
 	
 	public void addUnitsService(int id, int units) {

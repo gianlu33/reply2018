@@ -55,7 +55,8 @@ public class Project {
 	
 	public String toString() {
 		//return this.id + " " + this.penalty + " " + this.c + "\n" + this.unitsXservice;
-		return "Progetto: " +  this.id + " " + this.necessity + " " + this.totUnits + "\n" + this.unitsXservice;
+		//return "Progetto: " +  this.id + " " + this.necessity + " " + this.totUnits + "\n" + this.unitsXservice;
+		return "Progetto: " +  this.id + " " + this.necessity + " " + this.totUnits + "\n" + this.numberPackets;
 
 	}
 	
@@ -63,13 +64,14 @@ public class Project {
 		this.unitsXservice.replace(serv, units);		
 	}
 	
-	public void incrementaPackage(int id) {
+	public void incrementaPackage(int id, int np) {
 		//OTTIMIZZARE, FA SCHIFO
 		if(this.numberPackets.containsKey(id)) {
 			int num = this.numberPackets.get(id);
-			this.numberPackets.replace(id, ++num);
+			this.numberPackets.replace(id, num+np);
 		}
-		else this.numberPackets.put(id, 1);
+		else this.numberPackets.put(id, np);
+		//System.out.println(id);
 	}
 	
 	public Set<Entry<Integer, Integer>> getEntries() {

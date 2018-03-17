@@ -183,8 +183,7 @@ public class Algorithm {
 			//controllo se per caso ho finito
 			if(pass == null) break;
 			else assegnaRisorseProgetto(pass);
-		}
-	
+		}	
 	}
 	
 	private void calcolaNecessita() {
@@ -215,7 +214,7 @@ public class Algorithm {
 		}
 		
 		if(pass == null) pj.setIgnore(true);
-		else assegna(pj, pass);
+		else assegna(pj, pass, 0.01);
 	}
 	
 	private void calcoloAppetibilita(Project pj) {
@@ -251,23 +250,30 @@ public class Algorithm {
 		
 	}
 	
-	private void assegna(Project pj, Package pk) {
+	private void assegna(Project pj, Package pk, double perc) {
 		//OTTIMIZZARE:  tolgo e rimetto dalla mappa non mi piace
-		int un, tot=0;
+		int un, tot=0, decr;
+		
+		//perc -> assegno perc% dei pacchetti +1
+		int numPack = (int) (pk.getDisp()*perc) + 1;
+		//System.out.println(numPack);
 
-		pk.decrementDisp();
+		pk.decrementDisp(numPack);
 		pk.addProject(pj);
 		
 		for(int i=0; i<S; i++) {
 			un = pj.getUnitsService(i);
-			un -= pk.getUnitsxService(i);
+			decr = pk.getUnitsxService(i)*numPack;
+			//if(decr<0) System.out.println("err");
+			un -= decr;
+			
 			if(un < 0) un = 0;
 			pj.refreshUnitService(i, un);
 			tot+=un;
 		}	
 		pj.setTotalUnits(tot);
 		
-		pj.incrementaPackage(pk.getId());
+		pj.incrementaPackage(pk.getId(), numPack);
 		//System.out.println("assegnato pacchetto " + pk +  " a " + pj);
 	}
 	
