@@ -15,7 +15,8 @@ public class Package {
 	private Set<Project> progettiServiti;
 	private Provider p;
 	private Region r;
-	private int totUnits;
+	private int totUnits, qnt;
+	private boolean appetibile;
 	
 	public Package(int id, int disp, double price, Provider p, Region r) {
 		// TODO Auto-generated constructor stub
@@ -103,5 +104,20 @@ public class Package {
 	public void calcolaTotUnits() {
 		this.unitsXservice.values().stream().collect(Collectors.summingInt(a->a));
 	}
-
+	
+	public int getQnt() {
+		return this.qnt;
+	}
+	
+	public void setQnt(int q) {
+		this.qnt = q;
+	}
+	
+	public boolean getAppetibile() {
+		return this.appetibile;
+	}
+	
+	public void setAppetibile(boolean bool) {
+		this.appetibile = bool;
+	}
 }

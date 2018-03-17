@@ -21,19 +21,31 @@ public class Algorithm {
 	private Map<String, Integer> idcountries; //serve?
 	private List<Package> packages;
 	private List<Project> projects;
+	private int modPres;
+	private double modPerc;
 	
 	public Algorithm() {
 		// TODO Auto-generated constructor stub
-		services = new TreeMap<>();
-		countries = new TreeMap<>();
-		packages = new LinkedList<>();
-		projects = new LinkedList<>();
-		idcountries = new TreeMap<>();
-		is=0;
-		ic=0;
-		ipr=0;
-		ipk=0;
-		ipj=0;
+		this.services = new TreeMap<>();
+		this.countries = new TreeMap<>();
+		this.packages = new LinkedList<>();
+		this.projects = new LinkedList<>();
+		this.idcountries = new TreeMap<>();
+		this.is=0;
+		this.ic=0;
+		this.ipr=0;
+		this.ipk=0;
+		this.ipj=0;
+		this.modPres = 1;
+		this.modPerc = 1;
+	}
+	
+	public void setModPres(int val) {
+		this.modPres = val;
+	}
+	
+	public void setModPerc(double val) {
+		this.modPerc = val;
 	}
 
 	public void inputData(String file) {
@@ -206,58 +218,78 @@ public class Algorithm {
 		
 		//ordino pacchetti
 		Collections.sort(packages, (a,b)-> Double.compare(b.getAppetibilita(), a.getAppetibilita()));
+		//System.out.println(packages);
 		
 		//estraggo il pacchetto migliore
 		for(Package pk : packages) {
-			if(pk.getAppetibilita() != 0) {
+			if(pk.getAppetibile()) {
 				pass = pk;
 				break;
 			}
 		}
 		
 		if(pass == null) pj.setIgnore(true);
-		else assegna(pj, pass, 0.01);
+		else assegna(pj, pass);
 	}
 	
 	private void calcoloAppetibilita(Project pj) {
-		int sommaAppetibili, i, resPj, dispPk;
+		int sommaAppetibili, i, resPj, dispPk, mult;
 		double appet, modPreso;
 		int idc = pj.getCountry().getId();
+		boolean isappet;
 		
 		for(Package p : packages) {
+			mult=0;
 			sommaAppetibili=0;
+			p.setAppetibile(false);
+			isappet = false;
 			
 			if(p.getDisp() == 0) {
 				p.setAppetibilita(0);
 				continue;
 			}
 			
-			//sommaappetibili
 			for(i=0; i<S; i++) {
 				resPj = pj.getUnitsService(i);
 				dispPk = p.getUnitsxService(i);
 				
-				if(resPj<dispPk) sommaAppetibili += resPj;
-				else sommaAppetibili += dispPk;
+				if(isappet==false && resPj>0 && dispPk>0) {
+					p.setAppetibile(true);
+					isappet=true;
+				}
+				
+				if(dispPk < resPj) sommaAppetibili += dispPk;
+				else sommaAppetibili += resPj;
+				
+				if (dispPk!=0) mult += resPj/dispPk;
+				
 			}
 			
+			if(isappet) {
+				
 			//setto modPreso
-			if(p.checkProject(pj)) modPreso=2;
-			else modPreso=1;
+			if(p.checkProject(pj)) modPreso = this.modPres;
+			else modPreso = 1;
 			
 			appet = ((double)sommaAppetibili)/(p.getPrice()*(double)p.getLatencyxCountry(idc)*modPreso);
 			p.setAppetibilita(appet);
-			
+			p.setQnt(mult/S);	
+			}
 		}
 		
 	}
 	
-	private void assegna(Project pj, Package pk, double perc) {
+	private void assegna(Project pj, Package pk) {
 		//OTTIMIZZARE:  tolgo e rimetto dalla mappa non mi piace
-		int un, tot=0, decr;
+		int un, tot=0, decr, numPack;
+		int qnt, disp;
+		
+		qnt = pk.getQnt();
+		disp = pk.getDisp();
 		
 		//perc -> assegno perc% dei pacchetti +1
-		int numPack = (int) (pk.getDisp()*perc) + 1;
+		if(qnt<disp) numPack = (int) (pk.getQnt()*this.modPerc) + 1;
+		else numPack = (int) (pk.getDisp()*this.modPerc) + 1;
 		//System.out.println(numPack);
 
 		pk.decrementDisp(numPack);

@@ -55,8 +55,8 @@ public class Project {
 	
 	public String toString() {
 		//return this.id + " " + this.penalty + " " + this.c + "\n" + this.unitsXservice;
-		//return "Progetto: " +  this.id + " " + this.necessity + " " + this.totUnits + "\n" + this.unitsXservice;
-		return "Progetto: " +  this.id + " " + this.necessity + " " + this.totUnits + "\n" + this.numberPackets;
+		return "Progetto: " +  this.id + " " + this.necessity + " " + this.totUnits + "\n" + this.unitsXservice;
+		//return "Progetto: " +  this.id + " " + this.necessity + " " + this.totUnits + "\n" + this.numberPackets;
 
 	}
 	

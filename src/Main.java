@@ -3,25 +3,33 @@ import reply2018java.Algorithm;
 public class Main {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		Algorithm a = new Algorithm();
+		Algorithm a;
+		String[] str = {"first", "second", "third", "fourth"};
 		
-		//System.out.flush();
-		a.inputData("second_adventure.in");
-		
-		System.out.println("File letto correttamente");
-		
-		a.acquistaRisorse();
-		
-		System.out.println("Risorse acquistate");
-		
-		a.outputFile("second_adventure.out");
-		
-		System.out.println("Stampa eseguita");
-		
-		//a.controllaValori();
-		
-		System.out.println("Fine");		
+		for(String s : str) {
+			a = new Algorithm();
+			
+			a.setModPerc(0.01);
+			a.setModPres(2);
+			
+			//System.out.flush();
+			a.inputData(s + "_adventure.in");
+			
+			System.out.println(s + ": File letto correttamente");
+			
+			a.acquistaRisorse();
+			
+			System.out.println(s + ": Risorse acquistate");
+			
+			a.outputFile(s + "_adventure.out");
+			
+			System.out.println(s + ": Stampa eseguita");
+			
+			//a.controllaValori();
+			
+			System.out.println(s + ": Fine");
+			
+		}
 		
 	}
 
