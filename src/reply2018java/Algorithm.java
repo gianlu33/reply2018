@@ -158,10 +158,11 @@ public class Algorithm {
 	public void acquistaRisorse() {
 		Project pass;
 		
+		calcolaNecessita();
+		Collections.sort(projects, (a,b)-> Double.compare(b.getNecessita(),a.getNecessita()));
+		
 		while(true) {
 			pass = null;
-			calcolaNecessita();
-			Collections.sort(projects, (a,b)-> Double.compare(b.getNecessita(),a.getNecessita()));
 			//System.out.println(projects);
 			
 			//devo prendere progetti che non sono settati ignore, se non riesco a prendere niente ho finito
@@ -182,7 +183,8 @@ public class Algorithm {
 			
 			//controllo se per caso ho finito
 			if(pass == null) break;
-			else assegnaRisorseProgetto(pass);
+			assegnaRisorseProgetto(pass);
+			riaggiungiProgetto(pass);
 		}	
 	}
 	
@@ -335,8 +337,23 @@ public class Algorithm {
 		System.out.println("Situazione progetti:");
 		Collections.sort(projects, (a,b) -> Double.compare(b.getNecessita(), a.getNecessita()));
 		//Collections.sort(projects, (a,b) -> a.getTotalUnits()-b.getTotalUnits());
-
+		
 		System.out.println(projects);
-
+	}
+	
+	private void riaggiungiProgetto(Project p) {
+		//funziona
+		projects.remove(p);
+		p.calcolaNecessita();
+		double nec = p.getNecessita();
+		int ind=projects.size();
+		
+		for(Project pj : projects) {
+			if(pj.getNecessita() < nec) {
+				ind = projects.indexOf(pj);
+				break;
+			}
+		}
+		projects.add(ind, p);
 	}
 }
