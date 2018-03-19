@@ -7,18 +7,17 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Set;
-import java.util.Map.Entry;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.util.Collection;
 
 
 public class Algorithm {
 	private int V,S,C,P;
 	private int is, ic, ipr, ipk, ipj;
-	private Map<Integer, Service> services; //serve?
-	private Map<Integer, Country> countries; // serve?
-	private Map<String, Integer> idcountries; //serve?
+	private Map<Integer, Service> services;
+	private Map<Integer, Country> countries;
+	private Map<String, Integer> idcountries;
 	private List<Package> packages;
 	private List<Project> projects;
 	private int modPres;
@@ -113,6 +112,8 @@ public class Algorithm {
 				np = Integer.parseInt(data[0]);
 				cp = Double.parseDouble(data[1]);
 				pack = new Package(ipk++, np, cp, p, r);
+				//System.out.println("Pacchetto " + (ipk-1) + " " + (ipr-1) + " " + ir);
+				//System.out.println("Pacchetto " + (ipk-1) + " " + pack.getProvider().getId() + " " + pack.getRegion().getId());
 				packages.add(pack);
 				
 				for(k=0; k<S; k++) {
@@ -168,7 +169,7 @@ public class Algorithm {
 	}
 		
 	public void acquistaRisorse() {
-		Project pass;
+		/*Project pass;
 		
 		calcolaNecessita();
 		Collections.sort(projects, (a,b)-> Double.compare(b.getNecessita(),a.getNecessita()));
@@ -197,19 +198,19 @@ public class Algorithm {
 			if(pass == null) break;
 			assegnaRisorseProgetto(pass);
 			riaggiungiProgetto(pass);
-		}	
+		}	*/
 	}
 	
-	private void calcolaNecessita() {
+	private void calcolaSLA() {
 		for(Project pj : projects) {
 			//System.out.println("Unita per penalty: " + (double)unita*(double)pj.getPenalty());
 			//System.out.println("Progetto " + pj.getId() + " ha bisogno di " + unita);
-			pj.calcolaNecessita();
+			pj.calcolaSLA();
 		}
 	}
 		
 	private void assegnaRisorseProgetto(Project pj) {
-		Package pass=null;
+		/*Package pass=null;
 		//devo provare ad assegnare un pacchett oin ordine
 		//se non assegno nessun pacchetto devo settare ignore al progetto
 
@@ -229,7 +230,7 @@ public class Algorithm {
 		}
 		
 		if(pass == null) pj.setIgnore(true);
-		else assegna(pj, pass);
+		else assegna(pj, pass);*/
 	}
 	
 	private void calcoloAppetibilita(Project pj) {
@@ -283,9 +284,10 @@ public class Algorithm {
 		//OTTIMIZZARE:  tolgo e rimetto dalla mappa non mi piace
 		int un, tot=0, decr, numPack;
 		int qnt, disp;
-		
 		qnt = pk.getQnt();
 		disp = pk.getDisp();
+		
+		//if(this.modPerc != 0) System.out.println("err");
 		
 		//perc -> assegno perc% dei pacchetti +1
 		if(qnt<disp) numPack = (int) (pk.getQnt()*this.modPerc) + 1;
@@ -307,24 +309,18 @@ public class Algorithm {
 		}	
 		pj.setTotalUnits(tot);
 		
-		pj.incrementaPackage(pk.getId(), numPack);
+		pj.incrementaPackage(pk, numPack);
 		//System.out.println("assegnato pacchetto " + pk +  " a " + pj);
 	}
 	
 	public void outputSchermo() {
-		//sono gia ordinati per nome
-		Set<Entry<Integer, Integer>> set;
-		Package p;
-		int id, num;
-		
+		List<Purchase> purchases;
+
 		for(Project pj : projects) {
-			set = pj.getEntries();
+			purchases = (List<Purchase>) pj.getPurchases();
 			
-			for(Entry<Integer, Integer> e : set) {
-				id = e.getKey();
-				num = e.getValue();
-				p = packages.get(id);
-				System.out.print(p.getProvider().getId() + " " + p.getRegion().getId() + " " + num + " ");
+			for(Purchase pu : purchases) {
+				System.out.print(pu + " ");
 			}
 			System.out.println();
 		}
@@ -335,21 +331,15 @@ public class Algorithm {
 		try {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		
-		Set<Entry<Integer, Integer>> set;
-		Package p;
-		int id, num;
+		Collection<Purchase> purchases;
 		
 		for(Project pj : projects) {
-			set = pj.getEntries();
+			purchases = pj.getPurchases();
 			
-			for(Entry<Integer, Integer> e : set) {
-				id = e.getKey();
-				num = e.getValue();
-				p = packages.get(id);
-				writer.append(p.getProvider().getId() + " " + p.getRegion().getId() + " " + num + " ");
+			for(Purchase pu : purchases) {
+				writer.append(pu + " ");
 			}
-			writer.append("\n");
-			
+			writer.newLine();
 		}
 		
 		writer.close();		
@@ -367,25 +357,75 @@ public class Algorithm {
 		
 		//situazione progetti
 		System.out.println("Situazione progetti:");
-		Collections.sort(projects, (a,b) -> Double.compare(b.getNecessita(), a.getNecessita()));
+		Collections.sort(projects, (a,b) -> Double.compare(b.getSLA(), a.getSLA()));
 		//Collections.sort(projects, (a,b) -> a.getTotalUnits()-b.getTotalUnits());
 		
-		System.out.println(projects);
+		//System.out.println(projects);
 	}
 	
-	private void riaggiungiProgetto(Project p) {
-		//funziona
+	/*private void riaggiungiProgetto(Project p) {
 		projects.remove(p);
-		p.calcolaNecessita();
-		double nec = p.getNecessita();
+		p.calcolaSLA();
+		double nec = p.getSLA();
 		int ind=projects.size();
 		
 		for(Project pj : projects) {
-			if(pj.getNecessita() < nec) {
+			if(pj.getSLA() < nec) {
 				ind = projects.indexOf(pj);
 				break;
 			}
 		}
 		projects.add(ind, p);
+	}*/
+	
+	public void controllaAcquisti(String file) {
+		int prov, reg, num;
+		boolean found;
+		List<Purchase> acquisti = new LinkedList<>();
+		String line;
+		
+		try {
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+				
+		for(int i=0; i<P; i++) {
+			line = reader.readLine();
+			String[] data = line.split(" ");
+			
+			for(int j=0; j<data.length; j+=3) {
+				prov = Integer.parseInt(data[j]);
+				reg = Integer.parseInt(data[j+1]);
+				num = Integer.parseInt(data[j+2]);
+				
+				found = false;
+				for(Purchase b : acquisti) {
+					if(b.getPackage().getProvider().getId() == prov && b.getPackage().getRegion().getId() == reg) {
+						b.incrNum(num);
+						found = true;
+						break;
+					}
+				}
+				
+				if(!found) {
+					for(Package p : packages) {
+						if(p.getProvider().getId() == prov && p.getRegion().getId() == reg) {
+							acquisti.add(new Purchase(p, num));
+							break;
+						}
+					}
+				}
+				
+			}
+		}
+		
+		reader.close();
+		}
+		catch(IOException ioe){
+			System.out.println(ioe.getMessage());
+		}
+		
+		Collections.sort(acquisti, Purchase::compare);
+		System.out.println(acquisti);
+		System.out.println(packages);
+		
 	}
 }

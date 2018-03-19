@@ -7,7 +7,7 @@ import java.util.HashSet;
 
 public class Package {
 	
-	private int id, disp;
+	private int id, disp, tot;
 	private double price;
 	private double appet;
 	private Map<Integer, Integer> unitsXservice;
@@ -18,10 +18,11 @@ public class Package {
 	private int totUnits, qnt;
 	private boolean appetibile;
 	
-	public Package(int id, int disp, double price, Provider p, Region r) {
+	public Package(int id, int tot, double price, Provider p, Region r) {
 		// TODO Auto-generated constructor stub
 		this.id = id;
-		this.disp = disp;
+		this.tot = tot;
+		this.disp = tot;
 		this.price = price;
 		this.p = p;
 		this.r = r;
@@ -34,6 +35,10 @@ public class Package {
 	
 	public int getId() {
 		return this.id;
+	}
+	
+	public int getTot() {
+		return this.tot;
 	}
 	
 	public int getDisp() {
@@ -66,7 +71,8 @@ public class Package {
 	
 	public String toString() {
 		//return this.id + " Disp:" + this.disp + " Price:" + this.price + "\n" + "Provider: " + this.p + "\n" + "Region: " + this.r + "\nUnits: " + this.unitsXservice + "\nLatency: " + this.latencyXcountry;
-	return this.id + " Disp: " + this.disp;
+	//return this.id + " Disp: " + this.disp;
+		return this.p.getId() + " " + this.r.getId() + " " + this.tot;
 	}
 	
 	public double getAppetibilita() {
