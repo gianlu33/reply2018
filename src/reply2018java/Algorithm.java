@@ -168,8 +168,8 @@ public class Algorithm {
 				
 	}
 		
-	public void acquistaRisorse() {
-		/*Project pass;
+	/*public void acquistaRisorse() {
+		Project pass;
 		
 		calcolaNecessita();
 		Collections.sort(projects, (a,b)-> Double.compare(b.getNecessita(),a.getNecessita()));
@@ -198,7 +198,18 @@ public class Algorithm {
 			if(pass == null) break;
 			assegnaRisorseProgetto(pass);
 			riaggiungiProgetto(pass);
-		}	*/
+		}	
+	}*/
+	
+	public void acquistaRisorse() {
+		this.calcolaSLA();
+		
+		Collections.sort(projects, Project::compareSLA);
+		//System.out.println(projects);
+		
+		for(Project p : projects) {
+			soddisfaProgetto(p);
+		}
 	}
 	
 	private void calcolaSLA() {
@@ -209,8 +220,47 @@ public class Algorithm {
 		}
 	}
 		
-	private void assegnaRisorseProgetto(Project pj) {
-		/*Package pass=null;
+	private void soddisfaProgetto(Project pj) {
+		boolean fine = false;
+
+		//System.out.println(packages);
+		
+		//devo: prendere il primo e vedere se è buono
+		//BUONO -> assegno, riordino
+		//NON BUONO -> non assegno, passo al successivo
+		
+		//vedere se è buono -> 1 controllo numero pk | 2 calcolo A,B e vedo se conviene
+		//assegno -> solito
+		//controlla anche se progetto è concluso per evitare milioni di calcoli inutili
+		
+		while(!fine) {
+			//System.out.println(pj.getId());
+			fine = true;
+			this.calcoloAppetibilita(pj);
+			Collections.sort(packages, Package::compareAppet);
+			if(!packages.get(0).getAppetibile()) break;
+			
+			for(Package pk : packages) {
+				if(verificaAssegnazione(pj, pk)) {
+					this.assegna(pj, pk);
+					fine = false;
+					if(pj.getTotalUnits()==0) fine=true;
+					break;
+				}
+			}
+		}
+		
+	}
+	
+	private boolean verificaAssegnazione(Project pj, Package pk) {
+		 
+		return true;
+	}
+	
+	
+	
+	/*private void assegnaRisorseProgetto(Project pj) {
+		Package pass=null;
 		//devo provare ad assegnare un pacchett oin ordine
 		//se non assegno nessun pacchetto devo settare ignore al progetto
 
@@ -230,8 +280,8 @@ public class Algorithm {
 		}
 		
 		if(pass == null) pj.setIgnore(true);
-		else assegna(pj, pass);*/
-	}
+		else assegna(pj, pass);
+	}*/
 	
 	private void calcoloAppetibilita(Project pj) {
 		int sommaAppetibili, i, resPj, dispPk, mult;
@@ -315,6 +365,8 @@ public class Algorithm {
 	
 	public void outputSchermo() {
 		List<Purchase> purchases;
+		Collections.sort(projects, Project::compareId);
+
 
 		for(Project pj : projects) {
 			purchases = (List<Purchase>) pj.getPurchases();
@@ -332,6 +384,7 @@ public class Algorithm {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		
 		Collection<Purchase> purchases;
+		Collections.sort(projects, Project::compareId);
 		
 		for(Project pj : projects) {
 			purchases = pj.getPurchases();
@@ -352,15 +405,16 @@ public class Algorithm {
 	public void controllaValori() {
 		//pacchetti disponibili
 		System.out.println("Pacchetti rimanenti:");
-		Collections.sort(packages, (a,b)-> a.getId()-b.getId());
+		Collections.sort(packages, Package::compareId);
 		System.out.println(packages);
 		
 		//situazione progetti
 		System.out.println("Situazione progetti:");
-		Collections.sort(projects, (a,b) -> Double.compare(b.getSLA(), a.getSLA()));
+		this.calcolaSLA();
+		Collections.sort(projects, Project::compareSLA);
 		//Collections.sort(projects, (a,b) -> a.getTotalUnits()-b.getTotalUnits());
 		
-		//System.out.println(projects);
+		System.out.println(projects);
 	}
 	
 	/*private void riaggiungiProgetto(Project p) {

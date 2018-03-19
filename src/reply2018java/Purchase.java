@@ -6,6 +6,7 @@ public class Purchase {
 	
 	public Purchase(Package p, int num) {
 		// TODO Auto-generated constructor stub
+		this.p = p;
 		this.num = num;
 	}
 	

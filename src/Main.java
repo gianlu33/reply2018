@@ -25,7 +25,7 @@ public class Main {
 			
 			System.out.println(s + ": Stampa eseguita");
 			
-			//a.controllaValori();
+			a.controllaValori();
 			//a.controllaAcquisti(s + "_adventure.out");
 			
 			System.out.println(s + ": Fine");

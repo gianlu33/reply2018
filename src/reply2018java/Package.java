@@ -71,8 +71,8 @@ public class Package {
 	
 	public String toString() {
 		//return this.id + " Disp:" + this.disp + " Price:" + this.price + "\n" + "Provider: " + this.p + "\n" + "Region: " + this.r + "\nUnits: " + this.unitsXservice + "\nLatency: " + this.latencyXcountry;
-	//return this.id + " Disp: " + this.disp;
-		return this.p.getId() + " " + this.r.getId() + " " + this.tot;
+		return this.id + " Disp: " + this.disp;
+		//return this.p.getId() + " " + this.r.getId() + " " + this.tot;
 	}
 	
 	public double getAppetibilita() {
@@ -125,5 +125,13 @@ public class Package {
 	
 	public void setAppetibile(boolean bool) {
 		this.appetibile = bool;
+	}
+	
+	public static int compareAppet(Package a, Package b) {
+		return Double.compare(b.appet, a.appet);
+	}
+	
+	public static int compareId(Package a, Package b) {
+		return a.id-b.id;
 	}
 }

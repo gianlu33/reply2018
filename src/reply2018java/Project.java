@@ -75,8 +75,8 @@ public class Project {
 	}
 	*/
 	public void incrementaPackage(Package p, int np) {
-		if(!purchases.containsKey(p.getId())) purchases.put(id, new Purchase(p, np));
-		else purchases.get(id).incrNum(np);
+		if(!purchases.containsKey(p.getId())) purchases.put(p.getId(), new Purchase(p, np));
+		else purchases.get(p.getId()).incrNum(np);
 	}
 	
 	/*public Set<Entry<Integer, Integer>> getEntries() {
@@ -118,5 +118,12 @@ public class Project {
 	
 	public void calcolaTotUnits() {
 		this.totUnits = this.unitsXservice.values().stream().collect(Collectors.summingInt(a->a));
+	}
+	
+	public static int compareSLA(Project p1, Project p2) {
+		return Double.compare(p1.SLA, p2.SLA);
+	}
+	public static int compareId(Project p1, Project p2) {
+		return Double.compare(p1.id, p2.id);
 	}
 }
