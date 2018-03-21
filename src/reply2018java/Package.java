@@ -2,8 +2,6 @@ package reply2018java;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import java.util.Set;
-import java.util.HashSet;
 
 public class Package {
 	
@@ -12,7 +10,6 @@ public class Package {
 	private double appet;
 	private Map<Integer, Integer> unitsXservice;
 	private Map<Integer, Integer> latencyXcountry;
-	private Set<Project> progettiServiti;
 	private Provider p;
 	private Region r;
 	private int totUnits, qnt;
@@ -30,7 +27,6 @@ public class Package {
 		
 		unitsXservice = new TreeMap<>();
 		latencyXcountry = new TreeMap<>();
-		progettiServiti = new HashSet<>();
 	}
 	
 	public int getId() {
@@ -72,7 +68,7 @@ public class Package {
 	public String toString() {
 		//return this.id + " Disp:" + this.disp + " Price:" + this.price + "\n" + "Provider: " + this.p + "\n" + "Region: " + this.r + "\nUnits: " + this.unitsXservice + "\nLatency: " + this.latencyXcountry;
 		return this.id + " Disp: " + this.disp;
-		//return this.p.getId() + " " + this.r.getId() + " " + this.tot;
+		//return this.getId() + " " + this.getAppetibilita();
 	}
 	
 	public double getAppetibilita() {
@@ -81,14 +77,6 @@ public class Package {
 	
 	public void setAppetibilita(double app) {
 		this.appet = app;
-	}
-	
-	public void addProject(Project p) {
-		this.progettiServiti.add(p);
-	}
-	
-	public boolean checkProject(Project p) {
-		return this.progettiServiti.contains(p);
 	}
 	
 	public Provider getProvider() {
@@ -108,7 +96,7 @@ public class Package {
 	}
 	
 	public void calcolaTotUnits() {
-		this.unitsXservice.values().stream().collect(Collectors.summingInt(a->a));
+		this.totUnits = this.unitsXservice.values().stream().collect(Collectors.summingInt(a->a));
 	}
 	
 	public int getQnt() {
@@ -133,5 +121,13 @@ public class Package {
 	
 	public static int compareId(Package a, Package b) {
 		return a.id-b.id;
+	}
+	
+	public static int comparePR(Package a, Package b) {
+		if(a.p.getId()<b.p.getId()) return -1;
+		if(a.p.getId()==b.p.getId() && a.r.getId()<b.r.getId()) return -1;
+		if(a.p.getId()==b.p.getId() && a.r.getId()==b.r.getId()) return 0;
+		else return 1;
+
 	}
 }

@@ -18,16 +18,18 @@ public class Algorithm {
 	private Map<Integer, Service> services;
 	private Map<Integer, Country> countries;
 	private Map<String, Integer> idcountries;
+	private Map<Integer, Map<Integer,Package>> mapPackages;
 	private List<Package> packages;
 	private List<Project> projects;
-	private int modPres;
 	private double modPerc;
+	int scelte, migliori, peggiori;
 	
 	public Algorithm() {
 		// TODO Auto-generated constructor stub
 		this.services = new TreeMap<>();
 		this.countries = new TreeMap<>();
 		this.packages = new LinkedList<>();
+		this.mapPackages = new TreeMap<>();
 		this.projects = new LinkedList<>();
 		this.idcountries = new TreeMap<>();
 		this.is=0;
@@ -35,12 +37,8 @@ public class Algorithm {
 		this.ipr=0;
 		this.ipk=0;
 		this.ipj=0;
-		this.modPres = 1;
 		this.modPerc = 1;
-	}
-	
-	public void setModPres(int val) {
-		this.modPres = val;
+		this.scelte = this.migliori = this.peggiori =0;
 	}
 	
 	public void setModPerc(double val) {
@@ -90,12 +88,13 @@ public class Algorithm {
 		Package pack;
 		int rv, np;
 		double cp;
-		for(i=0; i<V; i++) {
+		for(i=0; i<V; i++, ipr++) {
 			//provider
 			line = reader.readLine();
 			data = line.split(" ");
 			rv = Integer.parseInt(data[1]);
-			p = new Provider(ipr++, data[0], rv);
+			p = new Provider(ipr, data[0], rv);
+			mapPackages.put(ipr, new TreeMap<>());
 			//System.out.println(p);
 			
 			for(j=0; j<rv; j++) {
@@ -115,6 +114,7 @@ public class Algorithm {
 				//System.out.println("Pacchetto " + (ipk-1) + " " + (ipr-1) + " " + ir);
 				//System.out.println("Pacchetto " + (ipk-1) + " " + pack.getProvider().getId() + " " + pack.getRegion().getId());
 				packages.add(pack);
+				mapPackages.get(ipr).put(ir, pack);
 				
 				for(k=0; k<S; k++) {
 					pack.addUnitsService(k, Integer.parseInt(data[k+2]));
@@ -131,6 +131,9 @@ public class Algorithm {
 				//System.out.println(pack);
 			}
 		}
+		
+		//System.out.println(packages);
+		//System.out.println(mapPackages.values());
 		
 		//progetti
 		Project pj;
@@ -154,7 +157,7 @@ public class Algorithm {
 				pj.addUnitsService(j, Integer.parseInt(data[j+2]));
 			}
 			
-			pj.calcolaTotUnits();
+			pj.initializeUnits();
 			//System.out.println(pj);
 		}
 		//System.out.println(projects);
@@ -168,199 +171,114 @@ public class Algorithm {
 				
 	}
 		
-	/*public void acquistaRisorse() {
-		Project pass;
-		
-		calcolaNecessita();
-		Collections.sort(projects, (a,b)-> Double.compare(b.getNecessita(),a.getNecessita()));
-		
-		while(true) {
-			pass = null;
-			//System.out.println(projects);
-			
-			//devo prendere progetti che non sono settati ignore, se non riesco a prendere niente ho finito
-			
-			//se il primo non ha bisogno di nulla, sono a posto
-			if(projects.get(0).getNecessita() == 0) {
-				//System.out.println("finish");
-				break;
-			}
-
-			for(Project pj : projects) {
-				if(pj.getIgnore() == false) {
-					pass = pj;
-					break;
-				}	
-			}
-			//System.out.println(pj.getId() + " " + pj.getNecessita());
-			
-			//controllo se per caso ho finito
-			if(pass == null) break;
-			assegnaRisorseProgetto(pass);
-			riaggiungiProgetto(pass);
-		}	
-	}*/
 	
 	public void acquistaRisorse() {
-		this.calcolaSLA();
-		
-		Collections.sort(projects, Project::compareSLA);
+		this.calcolaNec();
+		int count = 0;
+		Collections.sort(projects, Project::compareNec);
 		//System.out.println(projects);
 		
 		for(Project p : projects) {
+			System.out.println(count + "/" + P);
 			soddisfaProgetto(p);
+			count++;
 		}
 	}
 	
-	private void calcolaSLA() {
+	private void calcolaNec() {
 		for(Project pj : projects) {
 			//System.out.println("Unita per penalty: " + (double)unita*(double)pj.getPenalty());
 			//System.out.println("Progetto " + pj.getId() + " ha bisogno di " + unita);
-			pj.calcolaSLA();
+			pj.calcolaNec();
 		}
 	}
 		
 	private void soddisfaProgetto(Project pj) {
-		boolean fine = false;
-
-		//System.out.println(packages);
+		Package p;
 		
-		//devo: prendere il primo e vedere se è buono
-		//BUONO -> assegno, riordino
-		//NON BUONO -> non assegno, passo al successivo
-		
-		//vedere se è buono -> 1 controllo numero pk | 2 calcolo A,B e vedo se conviene
-		//assegno -> solito
-		//controlla anche se progetto è concluso per evitare milioni di calcoli inutili
-		
-		while(!fine) {
-			//System.out.println(pj.getId());
-			fine = true;
+		while(true) {			
 			this.calcoloAppetibilita(pj);
 			Collections.sort(packages, Package::compareAppet);
-			if(!packages.get(0).getAppetibile()) break;
 			
-			for(Package pk : packages) {
-				if(verificaAssegnazione(pj, pk)) {
-					this.assegna(pj, pk);
-					fine = false;
-					if(pj.getTotalUnits()==0) fine=true;
-					break;
-				}
-			}
-		}
-		
-	}
-	
-	private boolean verificaAssegnazione(Project pj, Package pk) {
-		 
-		return true;
-	}
-	
-	
-	
-	/*private void assegnaRisorseProgetto(Project pj) {
-		Package pass=null;
-		//devo provare ad assegnare un pacchett oin ordine
-		//se non assegno nessun pacchetto devo settare ignore al progetto
-
-		//calcolo appetibilita
-		calcoloAppetibilita(pj);
-		
-		//ordino pacchetti
-		Collections.sort(packages, (a,b)-> Double.compare(b.getAppetibilita(), a.getAppetibilita()));
-		//System.out.println(packages);
-		
-		//estraggo il pacchetto migliore
-		for(Package pk : packages) {
-			if(pk.getAppetibile()) {
-				pass = pk;
+			p = packages.get(0);
+			
+			if(p.getAppetibilita() <= 0) {
 				break;
 			}
+
+			this.assegna(pj, p);
+			
+			if(pj.getUnitsRemaining() == 0) break;
 		}
 		
-		if(pass == null) pj.setIgnore(true);
-		else assegna(pj, pass);
-	}*/
-	
+	}
+
 	private void calcoloAppetibilita(Project pj) {
-		int sommaAppetibili, i, resPj, dispPk, mult;
-		double appet, modPreso;
-		int idc = pj.getCountry().getId();
-		boolean isappet;
-		
-		for(Package p : packages) {
-			mult=0;
-			sommaAppetibili=0;
-			p.setAppetibile(false);
-			isappet = false;
+		double score;
+		int num; 
+		for(Package p : packages) {	
+			num = this.findQnt(pj, p);
+			
+			if(p.getAppetibile() == false) {
+				p.setAppetibilita(0);
+				continue;
+			}
 			
 			if(p.getDisp() == 0) {
 				p.setAppetibilita(0);
 				continue;
 			}
 			
-			for(i=0; i<S; i++) {
-				resPj = pj.getUnitsService(i);
-				dispPk = p.getUnitsxService(i);
-				
-				if(isappet==false && resPj>0 && dispPk>0) {
-					p.setAppetibile(true);
-					isappet=true;
-				}
-				
-				if(dispPk < resPj) sommaAppetibili += dispPk;
-				else sommaAppetibili += resPj;
-				
-				if (dispPk!=0) mult += resPj/dispPk;
-				
-			}
+			pj.calcolaScore();
+			score = pj.getScore();
+			pj.incrementaPackage(p, num);
+			pj.calcolaScore();
 			
-			if(isappet) {
-				
-			//setto modPreso
-			if(p.checkProject(pj)) modPreso = this.modPres;
-			else modPreso = 1;
+			score = pj.getScore() - score;
 			
-			appet = ((double)sommaAppetibili)/(p.getPrice()*(double)p.getLatencyxCountry(idc)*modPreso);
-			p.setAppetibilita(appet);
-			p.setQnt(mult/S);	
-			}
+			p.setAppetibilita(score);
+			pj.decrementaPackage(p, num);
+		}
+	}
+
+	private int findQnt(Project pj, Package pk) {
+		int numR, numD, numPack=0, disp, num=0;
+		
+		for(int i=0; i<S; i++) {
+			numR = pj.getUnitsRemaining(i);
+			numD = pk.getUnitsxService(i);
+			
+			if(numD != 0) num =  numR / numD;
+			
+			if(num > numPack) numPack = num;
 		}
 		
+		disp = pk.getDisp();
+		
+		if(numPack > disp) numPack = disp;
+		numPack *= this.modPerc;
+		
+		if(numPack == 0) return 1;
+		else return numPack;
 	}
 	
 	private void assegna(Project pj, Package pk) {
-		//OTTIMIZZARE:  tolgo e rimetto dalla mappa non mi piace
-		int un, tot=0, decr, numPack;
-		int qnt, disp;
-		qnt = pk.getQnt();
-		disp = pk.getDisp();
+		int numPack=1;
+		//numPack = findQnt(pj, pk);
 		
-		//if(this.modPerc != 0) System.out.println("err");
+		/*pj.calcolaScore();
+		double score0 = pj.getScore();*/
 		
-		//perc -> assegno perc% dei pacchetti +1
-		if(qnt<disp) numPack = (int) (pk.getQnt()*this.modPerc) + 1;
-		else numPack = (int) (pk.getDisp()*this.modPerc) + 1;
-		//System.out.println(numPack);
-
 		pk.decrementDisp(numPack);
-		pk.addProject(pj);
-		
-		for(int i=0; i<S; i++) {
-			un = pj.getUnitsService(i);
-			decr = pk.getUnitsxService(i)*numPack;
-			//if(decr<0) System.out.println("err");
-			un -= decr;
-			
-			if(un < 0) un = 0;
-			pj.refreshUnitService(i, un);
-			tot+=un;
-		}	
-		pj.setTotalUnits(tot);
-		
 		pj.incrementaPackage(pk, numPack);
 		//System.out.println("assegnato pacchetto " + pk +  " a " + pj);
+		
+		/*pj.calcolaScore();
+		double score1 = pj.getScore();
+		
+		this.scelte++;
+		if(score1<=score0) this.peggiori++;
+		else this.migliori++;*/
 	}
 	
 	public void outputSchermo() {
@@ -410,27 +328,14 @@ public class Algorithm {
 		
 		//situazione progetti
 		System.out.println("Situazione progetti:");
-		this.calcolaSLA();
-		Collections.sort(projects, Project::compareSLA);
+		this.calcolaNec();
+		Collections.sort(projects, Project::compareId);
 		//Collections.sort(projects, (a,b) -> a.getTotalUnits()-b.getTotalUnits());
 		
 		System.out.println(projects);
-	}
-	
-	/*private void riaggiungiProgetto(Project p) {
-		projects.remove(p);
-		p.calcolaSLA();
-		double nec = p.getSLA();
-		int ind=projects.size();
 		
-		for(Project pj : projects) {
-			if(pj.getSLA() < nec) {
-				ind = projects.indexOf(pj);
-				break;
-			}
-		}
-		projects.add(ind, p);
-	}*/
+		//System.out.println("Scelte: " + scelte + " Migliori: " + migliori + " Peggiori: " + peggiori);
+	}
 	
 	public void controllaAcquisti(String file) {
 		int prov, reg, num;
@@ -443,6 +348,7 @@ public class Algorithm {
 				
 		for(int i=0; i<P; i++) {
 			line = reader.readLine();
+			if(line.length()<2) continue;
 			String[] data = line.split(" ");
 			
 			for(int j=0; j<data.length; j+=3) {
@@ -459,14 +365,8 @@ public class Algorithm {
 					}
 				}
 				
-				if(!found) {
-					for(Package p : packages) {
-						if(p.getProvider().getId() == prov && p.getRegion().getId() == reg) {
-							acquisti.add(new Purchase(p, num));
-							break;
-						}
-					}
-				}
+				if(!found)
+					acquisti.add(new Purchase(mapPackages.get(prov).get(reg), num));
 				
 			}
 		}
@@ -481,5 +381,17 @@ public class Algorithm {
 		System.out.println(acquisti);
 		System.out.println(packages);
 		
+	}
+	
+	
+	public void calcolaPunteggi() {
+		double score=0;
+		
+		for(Project pj : projects) {
+			pj.calcolaScore();
+			score += pj.getScore();
+		}
+		
+		System.out.println("Punteggio totale: " + score);
 	}
 }
