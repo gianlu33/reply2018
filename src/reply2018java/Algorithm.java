@@ -22,7 +22,8 @@ public class Algorithm {
 	private List<Package> packages;
 	private List<Project> projects;
 	private double modPerc;
-	int scelte, migliori, peggiori;
+	private int numPackages;
+	//private int scelte, migliori, peggiori;
 	
 	public Algorithm() {
 		// TODO Auto-generated constructor stub
@@ -38,13 +39,13 @@ public class Algorithm {
 		this.ipk=0;
 		this.ipj=0;
 		this.modPerc = 1;
-		this.scelte = this.migliori = this.peggiori =0;
+		//this.scelte = this.migliori = this.peggiori =0;
 	}
 	
 	public void setModPerc(double val) {
 		this.modPerc = val;
 	}
-
+	
 	public void inputData(String file) {
 		int i,j,k, ir;
 		try {
@@ -132,6 +133,8 @@ public class Algorithm {
 			}
 		}
 		
+		this.numPackages = packages.size();
+		
 		//System.out.println(packages);
 		//System.out.println(mapPackages.values());
 		
@@ -199,14 +202,19 @@ public class Algorithm {
 		while(true) {			
 			this.calcoloAppetibilita(pj);
 			Collections.sort(packages, Package::compareAppet);
+			if(packages.get(0).getAppetibilita() == 0) break;
 			
-			p = packages.get(0);
-			
-			if(p.getAppetibilita() <= 0) {
-				break;
+			for(int i=0; i<numPackages; i++) {
+				p = packages.get(i);
+				
+				if(p.getAppetibilita() <= 0) {
+					break;
+				}
+				
+				this.assegna(pj, p, this.modPerc/(i+1));
+				
+				if(pj.getUnitsRemaining() == 0) break;
 			}
-
-			this.assegna(pj, p);
 			
 			if(pj.getUnitsRemaining() == 0) break;
 		}
@@ -214,34 +222,25 @@ public class Algorithm {
 	}
 
 	private void calcoloAppetibilita(Project pj) {
-		double score;
-		int num; 
-		for(Package p : packages) {	
-			num = this.findQnt(pj, p);
-			
-			if(p.getAppetibile() == false) {
-				p.setAppetibilita(0);
-				continue;
-			}
-			
+		pj.calcolaScore();
+		double score = pj.getScore();
+		
+		for(Package p : packages) {				
 			if(p.getDisp() == 0) {
 				p.setAppetibilita(0);
 				continue;
 			}
 			
+			pj.incrementaPackage(p, 1);
 			pj.calcolaScore();
-			score = pj.getScore();
-			pj.incrementaPackage(p, num);
-			pj.calcolaScore();
+						
+			p.setAppetibilita(pj.getScore() - score);
 			
-			score = pj.getScore() - score;
-			
-			p.setAppetibilita(score);
-			pj.decrementaPackage(p, num);
+			pj.decrementaPackage(p, 1);
 		}
 	}
 
-	private int findQnt(Project pj, Package pk) {
+	private int findQnt(Project pj, Package pk, double perc) {
 		int numR, numD, numPack=0, disp, num=0;
 		
 		for(int i=0; i<S; i++) {
@@ -256,15 +255,15 @@ public class Algorithm {
 		disp = pk.getDisp();
 		
 		if(numPack > disp) numPack = disp;
-		numPack *= this.modPerc;
+		numPack *= perc;
 		
 		if(numPack == 0) return 1;
 		else return numPack;
 	}
 	
-	private void assegna(Project pj, Package pk) {
+	private void assegna(Project pj, Package pk, double perc) {
 		int numPack=1;
-		//numPack = findQnt(pj, pk);
+		numPack = findQnt(pj, pk, perc);
 		
 		/*pj.calcolaScore();
 		double score0 = pj.getScore();*/

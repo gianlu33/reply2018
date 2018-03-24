@@ -4,7 +4,13 @@ public class Main {
 
 	public static void main(String[] args) {
 		Algorithm a;
-		String[] str = {/*"first", "second",*/"third", "fourth" };
+		
+		String[] str = {
+				//"first", 
+				//"second",
+				//"third", 
+				//"fourth" 
+				};
 		
 		for(String s : str) {
 			a = new Algorithm();
